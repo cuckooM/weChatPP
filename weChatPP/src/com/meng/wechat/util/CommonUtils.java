@@ -12,10 +12,10 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
+import net.sf.json.JSONObject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.json.JSONObject;
 
 /**
  * 通用工具类
@@ -38,7 +38,7 @@ public class CommonUtils {
         JSONObject jsonObject = null;
         try {
             // 创建SSLContext对象
-            TrustManager[] tm = { new AnyX509TrustManager() };
+            TrustManager[] tm = { new X509TrustAnyManager() };
             SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");
             sslContext.init(null, tm, new java.security.SecureRandom());
             // 从SSLContext对象中得到SSLSocketFactory

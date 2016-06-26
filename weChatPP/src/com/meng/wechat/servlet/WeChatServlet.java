@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +14,6 @@ import com.meng.wechat.util.WeChatUtils;
  * 微信公众平台服务器处理请求的核心类
  * @author meng
  */
-@WebServlet("/weChatServlet")
 public class WeChatServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
