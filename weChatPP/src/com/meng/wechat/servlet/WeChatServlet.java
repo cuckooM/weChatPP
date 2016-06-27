@@ -57,6 +57,7 @@ public class WeChatServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         // 请求校验
         if (WeChatUtils.checkSignature(signature, timestamp, nonce, "")) {
+        	
             // 调用核心服务类接收处理请求
 //            String respXml = CoreService.processRequest(request);
 //            out.print(respXml);

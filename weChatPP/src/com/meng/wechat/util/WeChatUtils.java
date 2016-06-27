@@ -1,18 +1,40 @@
 package com.meng.wechat.util;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.meng.wechat.entity.AccessToken;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 /**
  * 微信工具类
  */
 
 public class WeChatUtils {
+	
+	/** 运行时日志 */
+    private static final Log log = LogFactory.getLog(WeChatUtils.class);
     
     /** 获取access_token接口调用地址。参数：APPID、APPSECRET。  */
     public static final String GET_ACCESSTOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
@@ -83,24 +105,96 @@ public class WeChatUtils {
 	}
 	
 	/**
-	 * 向微信服务器请求获取access_token
-	 * @return access_token
+     * 发送https请求通用方法
+     * 
+     * @param requestUrl 请求地址
+     * @param requestMethod 请求方式（GET、POST）
+     * @param outputStr 提交的数据
+     * @return JSONObject 解析后的响应值
+     */
+    public static JSONObject httpsRequest(String requestUrl, String requestMethod, String outputStr) {
+        JSONObject jsonObject = null;
+        try {
+            // 创建SSLContext对象
+            TrustManager[] tm = { new X509TrustAnyManager() };
+            SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");
+            sslContext.init(null, tm, new java.security.SecureRandom());
+            // 从SSLContext对象中得到SSLSocketFactory
+            SSLSocketFactory ssf = sslContext.getSocketFactory();
+
+            URL url = new URL(requestUrl);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setSSLSocketFactory(ssf);
+            
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            // 请求方式（GET/POST）
+            conn.setRequestMethod(requestMethod);
+
+            // 向输出流写数据
+            if (null != outputStr) {
+                OutputStream outputStream = conn.getOutputStream();
+                // 设置编码格式
+                outputStream.write(outputStr.getBytes("UTF-8"));
+                outputStream.close();
+            }
+
+            // 从输入流读取返回内容
+            InputStream inputStream = conn.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String str = null;
+            StringBuffer buffer = new StringBuffer();
+            while ((str = bufferedReader.readLine()) != null) {
+                buffer.append(str);
+            }
+
+            // 释放资源
+            bufferedReader.close();
+            inputStreamReader.close();
+            inputStream.close();
+            inputStream = null;
+            conn.disconnect();
+            jsonObject = JSONObject.fromObject(buffer.toString());
+        } catch (ConnectException ce) {
+            log.error("连接异常：{}", ce);
+        } catch (Exception e) {
+            log.error("https请求异常：{}", e);
+        }
+        return jsonObject;
+    }
+    
+    /**
+	 * 解析微信发来的请求（XML）
+	 * 
+	 * @param request
+	 * @return Map<String, String>
+	 * @throws Exception
 	 */
-	public static AccessToken requestAccessToken (String appId, String appSecret){
-	    String requestUrl = GET_ACCESSTOKEN_URL.replace("APPID", appId).replace("APPSECRET", appSecret);
-	    JSONObject value = CommonUtils.httpsRequest(requestUrl, "GET", null);
-	    String access_token = value.getString("access_token");
-	    int expires_in = -1;
-	    expires_in = value.getInt("expires_in");
-	    if (null == access_token || -1 == expires_in){
-	        String errcode = value.getString("errcode");
-	        String errmsg = value.getString("errmsg");
-	        System.out.println("The error code is " + errcode + ". The error message is " + errmsg);
-	        return null;
-	    }
-	    AccessToken accessToken = new AccessToken(access_token, expires_in);
-	    return accessToken;
+	public static Map<String, String> parseXml(HttpServletRequest request) throws Exception {
+		// 将解析结果存储在HashMap中
+		Map<String, String> map = new HashMap<String, String>();
+
+		// 从request中取得输入流
+		InputStream inputStream = request.getInputStream();
+		// 读取输入流
+		SAXReader reader = new SAXReader();
+		Document document = reader.read(inputStream);
+		// 得到xml根元素
+		Element root = document.getRootElement();
+		// 得到根元素的所有子节点
+		List<Element> elementList = root.elements();
+
+		// 遍历所有子节点
+		for (Element e : elementList)
+			map.put(e.getName(), e.getText());
+
+		// 释放资源
+		inputStream.close();
+		inputStream = null;
+
+		return map;
 	}
-	
 	
 }
