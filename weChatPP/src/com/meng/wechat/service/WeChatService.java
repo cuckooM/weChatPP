@@ -1,8 +1,13 @@
 package com.meng.wechat.service;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import net.sf.json.JSONObject;
 
 import com.meng.wechat.entity.AccessToken;
+import com.meng.wechat.entity.TextMessage;
 import com.meng.wechat.util.WeChatUtils;
 
 /**
@@ -31,6 +36,48 @@ public class WeChatService {
 	    return accessToken;
 	}
 
-	
+	/**
+	 * 处理微信发来的请求
+	 * 
+	 * @param request
+	 * @return xml
+	 */
+	public static String processRequest(HttpServletRequest request) {
+		// xml格式的消息数据
+		String respXml = null;
+		// 默认返回的文本消息内容
+		String respContent = "发送任意文本，我们开始聊天吧！";
+		try {
+			// 调用parseXml方法解析请求消息
+			Map<String, String> requestMap = WeChatUtils.parseXml(request);
+			// 发送方帐号
+			String fromUserName = requestMap.get("FromUserName");
+			// 开发者微信号
+			String toUserName = requestMap.get("ToUserName");
+			// 消息类型
+			String msgType = requestMap.get("MsgType");
+			// 消息创建时间
+//			String createTime = requestMap.get("CreateTime");
+			
+			// 文本消息
+			if (msgType.equals(WeChatUtils.MESSAGE_TYPE_TEXT)) {
+				String content = requestMap.get(WeChatUtils.ATTR_CONTENT);
+				// 进行处理得到回复
+//				respContent = ChatService.chat(fromUserName, createTime, content);
+				respContent = "你说的内容为：" + content;
+			}
+			// 回复文本消息
+			TextMessage textMessage = new TextMessage();
+			textMessage.setToUserName(fromUserName);
+			textMessage.setFromUserName(toUserName);
+			textMessage.setCreateTime(System.currentTimeMillis());
+			textMessage.setContent(respContent);
+			// 将文本消息对象转换成xml
+			respXml = WeChatUtils.messageToXml(textMessage);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return respXml;
+	}
 
 }
