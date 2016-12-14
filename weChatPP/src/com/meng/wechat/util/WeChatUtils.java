@@ -45,9 +45,15 @@ public class WeChatUtils {
     /** 获取access_token接口调用地址。参数：APPID、APPSECRET。  */
     public static final String GET_ACCESSTOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
     
-    public static final String APPID = "wx467edf2c564dd211";
+    public static final String APPID = "wx53ac70c6aabcbb7c";
     
-    public static final String APPSECRET = "9f8de2b06acd72c3c5f782d35e243364";
+    public static final String APPSECRET = "d4624c36b6795d1d99dcf0547af5443d";
+    
+    /** 获取用户列表。参数：ACCESS_TOKEN、 NEXT_OPENID*/
+    public static final String GET_USERLIST_URL = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&next_openid=NEXT_OPENID";
+    
+    /** 获取用户列表。参数：ACCESS_TOKEN、 NEXT_OPENID*/
+    public static final String GET_USERLIST_URL2 = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN";
     
     /** 消息类型：文本 */
     public static final String MESSAGE_TYPE_TEXT = "text";
@@ -239,9 +245,9 @@ public class WeChatUtils {
             conn.disconnect();
             jsonObject = JSONObject.fromObject(buffer.toString());
         } catch (ConnectException ce) {
-            log.error("连接异常：{}", ce);
+            log.error("连接异常：", ce);
         } catch (Exception e) {
-            log.error("https请求异常：{}", e);
+            log.error("https请求异常：", e);
         }
         return jsonObject;
     }
