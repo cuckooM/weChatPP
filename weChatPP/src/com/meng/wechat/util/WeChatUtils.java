@@ -55,6 +55,12 @@ public class WeChatUtils {
     /** 获取用户列表。参数：ACCESS_TOKEN、 NEXT_OPENID*/
     public static final String GET_USERLIST_URL2 = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN";
     
+    /** 获取单个用户详细信息。参数ACCESS_TOKEN、OPENID */
+    public static final String GET_USERINFO_URL = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN ";
+    
+    /** 批量获取用户基本信息。最多支持一次拉取100条。参数ACCESS_TOKEN */
+    public static final String POST_USERINFO_BATCH_URL = "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=ACCESS_TOKEN";
+    
     /** 消息类型：文本 */
     public static final String MESSAGE_TYPE_TEXT = "text";
     
@@ -202,6 +208,13 @@ public class WeChatUtils {
     public static JSONObject httpsRequest(String requestUrl, String requestMethod, String outputStr) {
         JSONObject jsonObject = null;
         try {
+        	
+        	if ("POST".equalsIgnoreCase(requestMethod)) {
+        		requestMethod = "POST";
+        	} else {
+        		requestMethod = "GET";
+        	}
+        	
             // 创建SSLContext对象
             TrustManager[] tm = { new X509TrustAnyManager() };
             SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");

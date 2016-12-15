@@ -1,5 +1,7 @@
 package com.meng.wechat.entity;
 
+import java.util.List;
+
 /**
  * 微信用户（粉丝）实体
  * @author shterm
@@ -46,7 +48,7 @@ public class WeChatUser {
 	private String groupid;
 	
 	/** 用户被打上的标签ID列表 */
-	private String tagid_list;
+	private List<Long> tagid_list;
 
 	public int getSubscribe() {
 		return subscribe;
@@ -152,12 +154,12 @@ public class WeChatUser {
 		this.groupid = groupid;
 	}
 
-	public String getTagid_list() {
+	public List<Long> getTagid_list() {
 		return tagid_list;
 	}
 
-	public void setTagid_list(String tagid_list) {
+	public void setTagid_list(List<Long> tagid_list) {
 		this.tagid_list = tagid_list;
 	}
-	
+
 }
