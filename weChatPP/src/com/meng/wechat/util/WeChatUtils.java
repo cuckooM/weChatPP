@@ -1,10 +1,12 @@
 package com.meng.wechat.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.net.ConnectException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -23,8 +25,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -32,6 +32,9 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.meng.wechat.entity.TextMessage;
+import com.sun.xml.internal.bind.marshaller.CharacterEscapeHandler;
+
+import net.sf.json.JSONObject;
 
 /**
  * 微信工具类
@@ -60,6 +63,12 @@ public class WeChatUtils {
     
     /** 批量获取用户基本信息。最多支持一次拉取100条。参数ACCESS_TOKEN */
     public static final String POST_USERINFO_BATCH_URL = "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=ACCESS_TOKEN";
+    
+    /** 被动回复数据的xml格式中的数据前缀 */
+    public static final String DATA_FORMAT_PREFIX = "<![CDATA[";
+    
+    /** 被动回复数据的xml格式中的数据后缀 */
+    public static final String DATA_FORMAT_SUFFIX = "]]>";
     
     /** 消息类型：文本 */
     public static final String MESSAGE_TYPE_TEXT = "text";
@@ -307,6 +316,16 @@ public class WeChatUtils {
 		try {
 			JAXBContext context = JAXBContext.newInstance(TextMessage.class);
 			Marshaller marshaller = context.createMarshaller();
+			// xml格式
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			// 去掉生成xml的默认报文头
+			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+			// 不进行转义字符的处理
+			marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
+				public void escape(char[] ch, int start,int length, boolean isAttVal, Writer writer) throws IOException {
+					writer.write(ch, start, length);
+				}
+			});
 			StringWriter sw = new StringWriter();
 			marshaller.marshal(textMessage, sw);
 			return sw.toString();

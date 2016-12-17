@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.meng.wechat.service.WeChatService;
 import com.meng.wechat.util.WeChatUtils;
 
 /**
@@ -32,7 +33,7 @@ public class WeChatServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         // 进行校验，若校验成功则返回echostr，表示接入成功；否则接入失败
-        if (WeChatUtils.checkSignature(signature, timestamp, nonce, "")) {
+        if (WeChatUtils.checkSignature(signature, timestamp, nonce, "mengbinTest")) {
             out.print(echostr);
         }
         out.close();
@@ -56,11 +57,12 @@ public class WeChatServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         // 请求校验
-        if (WeChatUtils.checkSignature(signature, timestamp, nonce, "")) {
+        if (WeChatUtils.checkSignature(signature, timestamp, nonce, "mengbinTest")) {
         	
             // 调用核心服务类接收处理请求
-//            String respXml = CoreService.processRequest(request);
-//            out.print(respXml);
+            String respXml = WeChatService.processRequest(request);
+            System.out.println(respXml);
+            out.print(respXml);
         }
         out.close();
         out = null;

@@ -1,12 +1,17 @@
 package com.meng.wechat.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.meng.wechat.entity.AccessToken;
+import com.meng.wechat.entity.TextMessage;
 import com.meng.wechat.entity.WeChatUser;
 import com.meng.wechat.util.WeChatUtils;
 
@@ -74,6 +79,50 @@ public class WeChatService {
 	    }
 	    AccessToken accessToken = new AccessToken(access_token, expires_in, time);
 	    return accessToken;
+	}
+	
+	/**
+	 * 处理微信发来的请求
+	 * 
+	 * @param request
+	 * @return xml
+	 */
+	public static String processRequest(HttpServletRequest request) {
+		// xml格式的消息数据
+		String respXml = null;
+		// 默认返回的文本消息内容
+		String respContent = "我收到了。";
+		try {
+			// 调用parseXml方法解析请求消息
+			Map<String, String> requestMap = WeChatUtils.parseXml(request);
+			// 发送方帐号
+			String fromUserName = requestMap.get("FromUserName");
+			// 开发者微信号
+			String toUserName = requestMap.get("ToUserName");
+			// 消息类型
+			String msgType = requestMap.get("MsgType");
+			// 消息创建时间
+			String createTime = requestMap.get("CreateTime");
+			
+			// 文本消息
+			if (msgType.equals(WeChatUtils.MESSAGE_TYPE_TEXT)) {
+				String content = requestMap.get("Content");
+//				respContent = ChatService.chat(fromUserName, createTime, content);
+				respContent = content;
+			}
+			// 回复文本消息
+			TextMessage textMessage = new TextMessage();
+			textMessage.setToUserName(fromUserName);
+			textMessage.setFromUserName(toUserName);
+			textMessage.setCreateTime(System.currentTimeMillis());
+			textMessage.setMsgType(WeChatUtils.MESSAGE_TYPE_TEXT);
+			textMessage.setContent(respContent);
+			// 将文本消息对象转换成xml
+			respXml = WeChatUtils.messageToXml(textMessage);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return respXml;
 	}
 
 	/**
@@ -173,7 +222,7 @@ public class WeChatService {
 			if (subscribe == 0) {
 				log.info("用户" + openid + "已取消关注。");
 			} else {
-				log.info("用户" + openid + "正在关注。" + weChatUser.toString());
+				log.info("用户" + openid + "正在关注。");
 			}
 		}
 		return weChatUserList;
