@@ -64,6 +64,9 @@ public class WeChatUtils {
     /** 批量获取用户基本信息。最多支持一次拉取100条。参数ACCESS_TOKEN */
     public static final String POST_USERINFO_BATCH_URL = "https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=ACCESS_TOKEN";
     
+    /** 客服接口-发消息 */
+    public static final String POST_CUSTOMER_SEND_URL = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=ACCESS_TOKEN";
+    
     /** 被动回复数据的xml格式中的数据前缀 */
     public static final String DATA_FORMAT_PREFIX = "<![CDATA[";
     

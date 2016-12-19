@@ -2,6 +2,7 @@ package com.meng.wechat.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +18,8 @@ import com.meng.wechat.util.WeChatUtils;
  */
 public class WeChatServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	WeChatService service = new WeChatService();
        
 	/**
 	 * 处理微信服务器发来的校验请求
@@ -58,11 +61,27 @@ public class WeChatServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         // 请求校验
         if (WeChatUtils.checkSignature(signature, timestamp, nonce, "mengbinTest")) {
-        	
             // 调用核心服务类接收处理请求
-            String respXml = WeChatService.processRequest(request);
-            System.out.println(respXml);
-            out.print(respXml);
+//            String respXml = WeChatService.processRequest(request);
+//            System.out.println(respXml);
+//            out.print(respXml);
+        	out.print("");
+        	try {
+				// 调用parseXml方法解析请求消息
+				Map<String, String> requestMap = WeChatUtils.parseXml(request);
+				// 发送方帐号
+				String fromUserName = requestMap.get("FromUserName");
+				// 开发者微信号
+				String toUserName = requestMap.get("ToUserName");
+				System.out.println("发送者openId是：" + fromUserName + "，接收者openId是：" + toUserName);
+				// 消息类型
+				String msgType = requestMap.get("MsgType");
+				// 消息创建时间
+				String createTime = requestMap.get("CreateTime");
+				service.sendCustomerMessage(fromUserName, "你好呀");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         }
         out.close();
         out = null;

@@ -1,5 +1,7 @@
 package com.meng.wechat.entity;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -10,6 +12,7 @@ import com.meng.wechat.util.WeChatUtils;
  * @author meng
  */
 @XmlRootElement(name="xml")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TextMessage {
 	
 	/** 接收方帐号（收到的OpenID） */

@@ -16,7 +16,8 @@ public class Test {
 //            System.out.println(token.getAccessToken());
 //            System.out.println(token.getExpiresIn());
 //        }
-    	service.getFans();
+//    	service.getFans();
+    	service.sendCustomerMessage("oQW4LuE2VOft3wBSZ95lQR9N3gs4", "Hello World");
     }
     
 }

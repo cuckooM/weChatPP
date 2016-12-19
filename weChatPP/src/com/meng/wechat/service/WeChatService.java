@@ -99,6 +99,7 @@ public class WeChatService {
 			String fromUserName = requestMap.get("FromUserName");
 			// 开发者微信号
 			String toUserName = requestMap.get("ToUserName");
+			log.info("发送者openId是：" + fromUserName + "，接收者openId是：" + toUserName);
 			// 消息类型
 			String msgType = requestMap.get("MsgType");
 			// 消息创建时间
@@ -124,7 +125,25 @@ public class WeChatService {
 		}
 		return respXml;
 	}
-
+	
+	public String sendCustomerMessage (String toUserName, String content) {
+		content = content.replace("\"", "\\\"");
+		String data = String.format("{\"touser\":\"%s\",\"msgtype\":\"text\",\"text\":{\"content\":\"%s\"}}", toUserName, content);
+		
+//		JSONObject data = new JSONObject();
+//		data.put("touser", toUserName);
+//		data.put("msgtype", "text");
+//		JSONObject text = new JSONObject();
+//		text.put("content", content);
+//		data.put("text", text);
+		AccessToken accessToken = getAccessToken();
+		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
+		log.info(data.toString());
+		JSONObject value = WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+		log.info(value);
+		return null;
+	}
+	
 	/**
 	 * 获取全部粉丝详细信息
 	 */
