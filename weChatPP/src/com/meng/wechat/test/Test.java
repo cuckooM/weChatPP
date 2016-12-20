@@ -16,8 +16,8 @@ public class Test {
 //            System.out.println(token.getAccessToken());
 //            System.out.println(token.getExpiresIn());
 //        }
-//    	service.getFans();
-    	service.sendCustomerMessage("oQW4LuE2VOft3wBSZ95lQR9N3gs4", "Hello World");
+    	service.getFans();
+//    	service.sendCustomerMessage("oBTnus21nkpP1rSC5Sz52BEtlEMY", "点击查看<a href=\"http://blog.csdn.net/lyq8479\">柳峰的博客</a>");
     }
     
 }

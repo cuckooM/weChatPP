@@ -126,22 +126,21 @@ public class WeChatService {
 		return respXml;
 	}
 	
-	public String sendCustomerMessage (String toUserName, String content) {
-		content = content.replace("\"", "\\\"");
-		String data = String.format("{\"touser\":\"%s\",\"msgtype\":\"text\",\"text\":{\"content\":\"%s\"}}", toUserName, content);
-		
-//		JSONObject data = new JSONObject();
-//		data.put("touser", toUserName);
-//		data.put("msgtype", "text");
-//		JSONObject text = new JSONObject();
-//		text.put("content", content);
-//		data.put("text", text);
+	/**
+	 * 客服接口发送文本消息
+	 * @param toUserName 接收者微信号
+	 * @param content 内容
+	 */
+	public void sendCustomerMessage (String toUserName, String content) {
+		JSONObject data = new JSONObject();
+		data.put("touser", toUserName);
+		data.put("msgtype", "text");
+		JSONObject text = new JSONObject();
+		text.put("content", content);
+		data.put("text", text);
 		AccessToken accessToken = getAccessToken();
 		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
-		log.info(data.toString());
-		JSONObject value = WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
-		log.info(value);
-		return null;
+		WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
 	}
 	
 	/**
