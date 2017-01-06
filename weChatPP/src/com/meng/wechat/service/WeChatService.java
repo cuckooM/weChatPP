@@ -128,10 +128,11 @@ public class WeChatService {
 	
 	/**
 	 * 客服接口发送文本消息
-	 * @param toUserName 接收者微信号
-	 * @param content 内容
+	 * @param toUserName 普通用户openid
+	 * @param content 文本消息内容
+	 * @return 结果
 	 */
-	public void sendCustomerMessage (String toUserName, String content) {
+	public JSONObject sendTextMessage (String toUserName, String content) {
 		JSONObject data = new JSONObject();
 		data.put("touser", toUserName);
 		data.put("msgtype", "text");
@@ -140,7 +141,93 @@ public class WeChatService {
 		data.put("text", text);
 		AccessToken accessToken = getAccessToken();
 		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
-		WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+	}
+	
+	/**
+	 * 客服接口发送图片消息
+	 * @param toUserName 普通用户openid
+	 * @param mediaId 发送的图片消息的媒体ID
+	 * @return 结果
+	 */
+	public JSONObject sendImageMessage (String toUserName, String mediaId) {
+		JSONObject data = new JSONObject();
+		data.put("touser", toUserName);
+		data.put("msgtype", "image");
+		JSONObject image = new JSONObject();
+		image.put("media_id", mediaId);
+		data.put("image", image);
+		AccessToken accessToken = getAccessToken();
+		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
+		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+	}
+	
+	/**
+	 * 客服接口发送语音消息
+	 * @param toUserName 普通用户openid
+	 * @param mediaId 发送的语音消息的媒体ID
+	 * @return 结果
+	 */
+	public JSONObject sendVoiceMessage (String toUserName, String mediaId) {
+		JSONObject data = new JSONObject();
+		data.put("touser", toUserName);
+		data.put("msgtype", "voice");
+		JSONObject voice = new JSONObject();
+		voice.put("media_id", mediaId);
+		data.put("voice", voice);
+		AccessToken accessToken = getAccessToken();
+		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
+		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+	}
+	
+	/**
+	 * 客服接口发送视频消息
+	 * @param toUserName 普通用户openid
+	 * @param mediaId 发送的视频消息的媒体ID
+	 * @param thumb_media_id 缩略图的媒体ID
+	 * @param title 视频消息的标题
+	 * @param description 视频消息的描述
+	 * @return 结果
+	 */
+	public JSONObject sendVideoMessage (String toUserName, String mediaId, String thumb_media_id, String title, String description) {
+		JSONObject data = new JSONObject();
+		data.put("touser", toUserName);
+		data.put("msgtype", "video");
+		JSONObject video = new JSONObject();
+		video.put("media_id", mediaId);
+		video.put("thumb_media_id", thumb_media_id);
+		video.put("title", title);
+		video.put("description", description);
+		data.put("video", video);
+		AccessToken accessToken = getAccessToken();
+		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
+		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+	}
+	
+	/**
+	 * 客服接口发送音乐消息
+	 * @param toUserName 普通用户openid
+	 * @param musicurl 音乐链接
+	 * @param hqmusicurl 高品质音乐链接，wifi环境优先使用该链接播放音乐
+	 * @param thumb_media_id 缩略图的媒体ID
+	 * @param title 音乐消息的标题
+	 * @param description 音乐消息的描述
+	 * @return 结果
+	 */
+	public JSONObject sendMusicMessage (String toUserName, String musicurl, String hqmusicurl, String thumb_media_id, String title, String description) {
+		JSONObject data = new JSONObject();
+		data.put("touser", toUserName);
+		data.put("msgtype", "music");
+		JSONObject music = new JSONObject();
+		music.put("musicurl", musicurl);
+		music.put("hqmusicurl", hqmusicurl);
+		music.put("thumb_media_id", thumb_media_id);
+		music.put("title", title);
+		music.put("description", description);
+		data.put("music", music);
+		AccessToken accessToken = getAccessToken();
+		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
+		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
 	}
 	
 	/**

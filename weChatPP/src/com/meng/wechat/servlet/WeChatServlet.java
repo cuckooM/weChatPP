@@ -78,7 +78,7 @@ public class WeChatServlet extends HttpServlet {
 				String msgType = requestMap.get("MsgType");
 				// 消息创建时间
 				String createTime = requestMap.get("CreateTime");
-				service.sendCustomerMessage(fromUserName, "你好呀");
+				service.sendTextMessage(fromUserName, "你好呀");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
