@@ -1,24 +1,24 @@
 package com.meng.wechat.service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.meng.wechat.entity.AccessToken;
-import com.meng.wechat.entity.TextMessage;
-import com.meng.wechat.entity.WeChatUser;
-import com.meng.wechat.util.WeChatUtils;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.meng.wechat.entity.AccessToken;
+import com.meng.wechat.entity.PictureText;
+import com.meng.wechat.entity.TextMessage;
+import com.meng.wechat.entity.WeChatUser;
+import com.meng.wechat.util.WeChatUtils;
 
 /**
  * 处理微信公众平台消息的服务类
@@ -225,6 +225,58 @@ public class WeChatService {
 		music.put("title", title);
 		music.put("description", description);
 		data.put("music", music);
+		AccessToken accessToken = getAccessToken();
+		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
+		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+	}
+	
+	/**
+	 * 客服接口发送图文消息（点击跳转到外链） 
+	 * @param toUserName 普通用户openid
+	 * @param articleList 图文消息内容实体列表，条数限制在8条以内
+	 * @return 结果
+	 */
+	public JSONObject sendNewsMessage (String toUserName, List<PictureText> articleList) {
+		JSONObject data = new JSONObject();
+		data.put("touser", toUserName);
+		data.put("msgtype", "news");
+		JSONObject news = new JSONObject();
+		JSONArray articles = new JSONArray();
+		for (int i = 0; i < articleList.size(); i++) {
+			if (i >= 8) {
+				// 最多支持八条
+				break;
+			}
+			PictureText pictureText = articleList.get(i);
+			JSONObject article = new JSONObject();
+			article.put("title", pictureText.getTitle());
+			article.put("description", pictureText.getDescription());
+			article.put("url", pictureText.getUrl());
+			article.put("picurl", pictureText.getPicurl());
+			articles.add(article);
+		}
+		news.put("articles", articles);
+		data.put("news", news);
+		
+		AccessToken accessToken = getAccessToken();
+		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
+		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
+	}
+	
+	/**
+	 * 客服接口发送图文消息（点击跳转到图文消息页面）
+	 * @param toUserName 普通用户openid
+	 * @param media_id 发送的图文消息（点击跳转到图文消息页）的媒体ID
+	 * @return 结果
+	 */
+	public JSONObject sendMpnewsMessage (String toUserName, String media_id) {
+		JSONObject data = new JSONObject();
+		data.put("touser", toUserName);
+		data.put("msgtype", "mpnews");
+		JSONObject mpnews = new JSONObject();
+		mpnews.put("media_id", media_id);
+		data.put("mpnews", mpnews);
+		
 		AccessToken accessToken = getAccessToken();
 		String requestUrl = WeChatUtils.POST_CUSTOMER_SEND_URL.replace("ACCESS_TOKEN", accessToken.getAccessToken());
 		return WeChatUtils.httpsRequest(requestUrl, "POST", data.toString());
